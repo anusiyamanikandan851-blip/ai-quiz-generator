@@ -29,48 +29,53 @@ QuizGen AI is a lightweight React + TypeScript AI quiz generator designed for an
 - Recharts
 - Lucide React
 
-## Run in VS Code
+## Local setup
 
 Requirements:
 - Node.js 18+ recommended
-- VS Code
 
-1. Extract the ZIP.
-2. Open the extracted folder in VS Code.
-3. Open the terminal.
-4. Install dependencies:
+Install dependencies and create your local environment file:
 
 ```bash
 npm install
 ```
 
-5. Optional: copy `.env.example` to `.env` and configure your AI provider.
+In PowerShell:
 
-6. Start:
+```powershell
+Copy-Item .env.example .env
+```
+
+Edit `.env` to configure an AI provider, then start the frontend and Express server together:
 
 ```bash
 npm run dev
 ```
 
-7. Open the URL shown by Vite.
+Open the URL shown by Vite (usually `http://localhost:5173`).
 
-## AI configuration
+Without an AI provider configured, the app uses its built-in demo questions. To enable AI generation, set these variables in the project-root `.env` file:
 
-The starter app works without an external key using built-in demo question data for Java/DBMS. For a real AI integration, configure:
+- `AI_API_KEY`: provider key, read only by the Express server.
+- `AI_API_URL`: provider endpoint. It must accept a JSON body containing `model` and `prompt`, and return generated text in `text`, `output`, or `choices[0].message.content`.
+- `AI_MODEL`: optional model name; defaults to `gemini-2.0-flash`.
+- `VITE_API_BASE_URL`: frontend API base URL; defaults to `http://localhost:5000`. This URL is public and must never contain a secret.
+- `PORT` and `FRONTEND_URL`: optional server settings; default to `5000` and `http://localhost:5173`.
 
-```env
-VITE_AI_API_KEY=
-VITE_AI_API_URL=
-VITE_AI_MODEL=
-```
+Never put an AI provider key in a `VITE_*` variable. Vite variables are included in the browser build.
 
-The expected endpoint should accept JSON containing `model` and `prompt`, and return generated text in one of `text`, `output`, or `choices[0].message.content`.
+Quizzes and history are stored in browser local storage. MongoDB is not required.
 
-For production, do not expose provider secrets in a browser application. Use a server-side proxy/API route and keep secrets on the server.
+## Deployment
 
-## Important
+The Netlify and Vercel configuration in this repository builds and serves the static frontend only. Deploy the Express server (`npm start`) to a Node.js host separately, then:
 
-The included fallback generator is for local/demo testing. Replace it with a secure server-side AI integration before production deployment.
+1. Set `AI_API_KEY` and `AI_API_URL` in the backend host's environment settings. Set `AI_MODEL` if needed.
+2. Set `FRONTEND_URL` on the backend to the deployed frontend's origin.
+3. Set `VITE_API_BASE_URL` to the backend's public base URL when building the frontend.
+4. Keep all provider credentials in the backend host's environment settings, never in frontend build variables.
+
+The app can still generate demo quizzes without provider credentials, but real AI generation requires the backend to be deployed and configured.
 
 ## Build
 
