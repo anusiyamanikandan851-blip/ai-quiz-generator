@@ -1,0 +1,9 @@
+import { Trash2, Trophy } from "lucide-react";
+import { getAttempts, getQuizzes, deleteQuiz } from "../utils/storage";
+import { useState } from "react";
+
+export default function History() {
+  const [tick,setTick]=useState(0); const quizzes=getQuizzes(); const attempts=getAttempts();
+  return <main className="mx-auto max-w-6xl px-4 py-10 sm:px-6"><div className="flex items-end justify-between"><div><p className="font-semibold text-brand-600">Progress</p><h1 className="text-4xl font-black dark:text-white">Quiz History</h1></div><a href="#/generate" className="rounded-xl bg-brand-600 px-4 py-3 font-bold text-white">New Quiz</a></div>
+  {quizzes.length===0?<div className="mt-10 rounded-2xl border border-dashed p-12 text-center text-slate-500">No quizzes yet. Create your first AI quiz.</div>:<div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">{quizzes.map(q=>{const a=attempts.find(x=>x.quizId===q.id);return <div key={q.id} className="rounded-2xl border bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900"><div className="flex items-center justify-between"><Trophy className="text-brand-600"/><button onClick={()=>{if(confirm("Delete this quiz?")){deleteQuiz(q.id);setTick(tick+1)}}} className="text-slate-400 hover:text-red-500"><Trash2 size={18}/></button></div><h2 className="mt-4 font-bold dark:text-white">{q.title}</h2><p className="mt-1 text-sm text-slate-500">{q.difficulty} · {q.questionCount} questions</p><p className="mt-4 text-2xl font-black dark:text-white">{a?`${a.percentage}%`:"Not attempted"}</p><div className="mt-4 flex gap-2"><a href={`#/quiz/${q.id}`} className="flex-1 rounded-xl border px-3 py-2 text-center text-sm dark:border-slate-700">Retry</a>{a&&<a href={`#/results/${q.id}`} className="flex-1 rounded-xl bg-brand-600 px-3 py-2 text-center text-sm font-bold text-white">Results</a>}</div></div>})}</div>}</main>
+}
